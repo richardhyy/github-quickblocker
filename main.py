@@ -127,9 +127,10 @@ def process_single_issue(issue, client, repo_owner, repo_name):
     # if there are comments, show them too.
     print('Issue #' + str(issue['number']) + ': ' + issue['title'])
     print('User: ' + issue['user']['login'])
-    print('Content: \n' + issue['body'])
-    print_separator()
-    ask_block(issue['user'], client)
+    if issue['body']:
+        print('Content: \n' + issue['body'])
+        print_separator()
+        ask_block(issue['user'], client)
 
     # show comments
     if issue['comments'] > 0:
@@ -184,7 +185,11 @@ def main():
     page = 1
     while issues:
         for issue in issues:
-            process_single_issue(issue, client, repo_owner, repo_name)
+            try:
+                process_single_issue(issue, client, repo_owner, repo_name)
+            except Exception as e:
+                print(e)
+                print('Could not process issue #' + str(issue['number']))
         page += 1
         issues = client.get_repo_issues(repo_owner, repo_name, page)
 
